@@ -19,7 +19,7 @@ class Habit {
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'Room{id: $id, name: $name, contactPhone: $repeatOn}';
+    return 'Habit{id: $id, name: $name, repeatOn: $repeatOn}';
   }
 }
 
@@ -90,7 +90,7 @@ class DBHelper {
   }
 
   // UPDATE
-  Future<void> updateRoom(Habit habit) async {
+  Future<void> updateHabit(Habit habit) async {
     final db = await database;
     await db.update(
       'habit',
