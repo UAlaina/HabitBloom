@@ -26,7 +26,7 @@ class Habit {
 
 
 
-class DBHelper {
+class DbHelper {
   static Database? _database;
 
   Future<Database> get database async {
