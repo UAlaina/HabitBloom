@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:habittracker/Views/dashboard_page.dart';
+import 'package:habittracker/Views/EX_dashboard_page.dart';
+//import 'package:habittracker/Views/dashboard_page.dart';
 import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {

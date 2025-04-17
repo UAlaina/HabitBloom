@@ -41,6 +41,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:habittracker/Views/EX_dashboard_page.dart';
 import 'package:habittracker/Views/addhabit_page.dart';
 import 'package:habittracker/Views/addworkout_page.dart';
 import 'package:habittracker/Views/dashboard_page.dart';
@@ -98,7 +99,6 @@ class _MainPageState extends State<MainPage> {
     SplashScreen(),
     MorningWorkoutPage(),
     SettingsPage(),
-    //ProfilePage(), // Replace with your actual ProfilePage widget
   ];
 
   @override

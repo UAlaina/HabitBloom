@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dashboard_page.dart';
+//import 'dashboard_page.dart';
+import 'package:habittracker/Views/EX_dashboard_page.dart';
 
 class CategoryPage extends StatefulWidget {
   final Category category;
