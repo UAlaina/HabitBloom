@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
       if (userDoc['password'] == password) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()), //gotta change this to the main page
+          MaterialPageRoute(builder: (context) => const DashboardPage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Incorrect password")));
