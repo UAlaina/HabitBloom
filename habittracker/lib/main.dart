@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'Views/splash_screen.dart';
+import 'package:habittracker/models/dbHelper.dart';
+
+//page imports
+import 'login/splash_screen.dart';
+import 'habits/habitlist_page.dart';
+
 
 //in json "package_name"
 //"package_name": "com.android.habitTracker"
@@ -18,6 +23,9 @@ void main() async {
       )
   );
 
+  // final dbHelper = DbHelper();
+  // await dbHelper.database;
+
   runApp(const MyApp());
 }
 
@@ -33,7 +41,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
+      //home: const SplashScreen(),
+      home: HabitlistPage(),
     );
   }
 }
@@ -44,17 +53,17 @@ class MyApp extends StatelessWidget {
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:habittracker/Views/EX_dashboard_page.dart';
-import 'package:habittracker/Views/addhabit_page.dart';
-import 'package:habittracker/Views/addworkout_page.dart';
-import 'package:habittracker/Views/dashboard_page.dart';
-import 'package:habittracker/Views/forgotpasswordpage.dart';
-import 'package:habittracker/Views/login_page.dart';
-import 'package:habittracker/Views/postit_page.dart';
-import 'package:habittracker/Views/profile_page.dart';
-import 'package:habittracker/Views/settings_page.dart';
-import 'package:habittracker/Views/signup_page.dart';
-import 'package:habittracker/Views/splash_screen.dart';
+import 'package:habittracker/views/EX_dashboard_page.dart';
+import 'package:habittracker/views/addhabit_page.dart';
+import 'package:habittracker/views/addworkout_page.dart';
+import 'package:habittracker/views/dashboard_page.dart';
+import 'package:habittracker/views/forgotpasswordpage.dart';
+import 'package:habittracker/views/login_page.dart';
+import 'package:habittracker/views/postit_page.dart';
+import 'package:habittracker/views/profile_page.dart';
+import 'package:habittracker/views/settings_page.dart';
+import 'package:habittracker/views/signup_page.dart';
+import 'package:habittracker/views/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

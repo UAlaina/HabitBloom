@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:habittracker/Views/EX_dashboard_page.dart';
-//import 'package:habittracker/Views/dashboard_page.dart';
+import 'package:habittracker/habits/addhabit_page.dart';
+//import 'package:habittracker/views/dashboard_page.dart';
 import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -32,7 +33,9 @@ class _LoginPageState extends State<LoginPage> {
       if (userDoc['password'] == password) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const DashboardPage()),
+          //MaterialPageRoute(builder: (context) => const DashboardPage()),
+          MaterialPageRoute(builder: (context) => AddNewHabitsPage()),
+
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Incorrect password")));

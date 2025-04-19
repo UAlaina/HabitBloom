@@ -12,7 +12,7 @@ class Habit {
   const Habit({required this.id, required this.name, required this.repeatOn});
 
   Map<String, Object?> toMap() {
-    return {'id': id, 'name': name, 'repeat': repeatOn};
+    return {'id': id, 'name': name, 'repeatOn': repeatOn};
   }
 
   // Implement toString to make it easier to see information about
