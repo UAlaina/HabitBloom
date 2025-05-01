@@ -78,7 +78,7 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
             //name
             _buildTextField('Habit Name', nameController),
             SizedBox(height: 16),
-            //description
+            // description
             // _buildTextField('Description', maxLines: 4),
             // SizedBox(height: 16),
             _buildDropdown('Frequency', ['Daily', 'Weekly', 'Monthly']),

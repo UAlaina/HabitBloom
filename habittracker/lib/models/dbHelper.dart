@@ -8,7 +8,7 @@ class Habit {
   final int id;
   final String name;
   final String type;
-  final String repeatOn;
+  final String repeatOn; //frequ
 
   const Habit({required this.id, required this.name, required this.type, required this.repeatOn});
 
@@ -20,11 +20,9 @@ class Habit {
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'Habit{id: $id, name: $name, type: $type, repeatOn: $repeatOn}';
+    return 'Habit{id: $id, name: $name,type: $type, repeatOn: $repeatOn}';
   }
 }
-
-
 
 
 class DbHelper {
@@ -48,7 +46,6 @@ class DbHelper {
       CREATE TABLE habit(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
-      type TEXT,
       repeatOn TEXT)
       ''',
         );
@@ -68,7 +65,6 @@ class DbHelper {
       {
         //room.toMap(), //is easy but maps everything including id, which wont AI
         'name': habit.name,
-        'type': habit.type,
         'repeatOn': habit.repeatOn,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -78,7 +74,7 @@ class DbHelper {
   // LIST
   Future<List<Habit>> getHabits() async {
     final db = await database;
-    final List<Map<String,dynamic>> query = await db.query('habit');
+    final List<Map<String, dynamic>> query = await db.query('habit');
 
     List<Habit> habits = [];
     query.forEach((map) {
@@ -120,10 +116,6 @@ class DbHelper {
     await deleteDatabase(dbPath);
   }
 
-
-}
-
-
 // GUIDE
 /*
 // Insert a Room
@@ -155,4 +147,4 @@ await dbHelper.updateRoom(updatedRoom);
 // Delete a Room
 await dbHelper.deleteRoom(1); // Deletes room with ID 1
  */
-
+}

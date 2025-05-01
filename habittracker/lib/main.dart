@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:habittracker/models/dbHelper.dart';
+import 'package:habittracker/notes/listNotesPage.dart';
 import 'package:sqflite/sqflite.dart';
 
 //page imports
@@ -48,7 +49,8 @@ class MyApp extends StatelessWidget {
       //home: const SplashScreen(),
       home:
       //AddNewHabitsPage(),
-      HabitlistPage(),
+      //HabitlistPage(),
+      ListNotesPage(),
     );
   }
 }
