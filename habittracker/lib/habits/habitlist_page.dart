@@ -55,37 +55,65 @@ class _HabitlistPageState extends State<HabitlistPage> {
         title: Text('My Habits'),
       ),
       body: _habits == null || _habits!.isEmpty
-          ? Center(
-        child: CircularProgressIndicator(),
-      ) :
-      ListView.builder(
-          itemCount: _habits!.length,
-          itemBuilder: (context, index) {
-            return Card(
-              child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        //Text(_habits![index].id.toString()),
-                        //Text(_habits![index].username),
-                        Text('Habit'),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                  ]
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+        padding: EdgeInsets.all(12),
+        itemCount: _habits!.length,
+        itemBuilder: (context, index) {
+          final habit = _habits![index];
+          return GestureDetector(
+            onTap: () =>
+            {
+              //_navigateToTaskList(habit.id),
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
-            );
-          }
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    habit.name,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (habit.type != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        'Type: ${habit.type}',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                      ),
+                    ),
+                  if (habit.repeatOn != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        'Repeats: ${habit.repeatOn}',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => AddNewHabitsPage()),
-          // );
-          _navigateToAddHabitPage();
-        },
+        onPressed: _navigateToAddHabitPage,
         backgroundColor: Colors.grey[400],
         child: const Icon(Icons.add),
       ),

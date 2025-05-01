@@ -114,6 +114,12 @@ class DbHelper {
     );
   }
 
+  //DELETE DB
+  Future<void> deleteDB() async {
+    final dbPath = join(await getDatabasesPath(), 'habit_db.db');
+    await deleteDatabase(dbPath);
+  }
+
 
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:habittracker/models/dbHelper.dart';
+import 'package:sqflite/sqflite.dart';
 
 //page imports
 import 'login/splash_screen.dart';
@@ -24,11 +25,13 @@ void main() async {
       )
   );
 
-  // final dbHelper = DbHelper();
-  // await dbHelper.database;
-
+  final dbHelper = DbHelper();
+  //await dbHelper.database;
+  //dbHelper.deleteDB();
   runApp(const MyApp());
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -43,10 +46,19 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       //home: const SplashScreen(),
-      home: AddNewHabitsPage(),
+      home:
+      //AddNewHabitsPage(),
+      HabitlistPage(),
     );
   }
 }
+
+
+
+
+
+
+
 
 
 //WHat does this do???

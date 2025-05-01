@@ -25,8 +25,8 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
 
     final habit = Habit(
       id: 0, //is ignored, should auto increment
-      type: 'test',
       name: nameController.text,
+      type: 'test',
       repeatOn: 'test',
     );
     //DEBUG
