@@ -6,6 +6,7 @@ import 'package:habittracker/models/dbHelper.dart';
 //page imports
 import 'login/splash_screen.dart';
 import 'habits/habitlist_page.dart';
+import 'habits/addhabit_page.dart';
 
 
 //in json "package_name"
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       //home: const SplashScreen(),
-      home: HabitlistPage(),
+      home: AddNewHabitsPage(),
     );
   }
 }

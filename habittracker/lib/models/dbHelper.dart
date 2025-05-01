@@ -7,19 +7,20 @@ import 'package:sqflite/sqflite.dart';
 class Habit {
   final int id;
   final String name;
+  final String type;
   final String repeatOn;
 
-  const Habit({required this.id, required this.name, required this.repeatOn});
+  const Habit({required this.id, required this.name, required this.type, required this.repeatOn});
 
   Map<String, Object?> toMap() {
-    return {'id': id, 'name': name, 'repeatOn': repeatOn};
+    return {'id': id, 'name': name, 'type': type, 'repeatOn': repeatOn};
   }
 
   // Implement toString to make it easier to see information about
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'Habit{id: $id, name: $name, repeatOn: $repeatOn}';
+    return 'Habit{id: $id, name: $name, type: $type, repeatOn: $repeatOn}';
   }
 }
 
@@ -47,6 +48,7 @@ class DbHelper {
       CREATE TABLE habit(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
+      type TEXT,
       repeatOn TEXT)
       ''',
         );
@@ -66,6 +68,7 @@ class DbHelper {
       {
         //room.toMap(), //is easy but maps everything including id, which wont AI
         'name': habit.name,
+        'type': habit.type,
         'repeatOn': habit.repeatOn,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -82,6 +85,7 @@ class DbHelper {
       habits.add(Habit(
         id: map['id'],
         name: map['name'],
+        type: map['type'],
         repeatOn: map['repeatOn'],
       ));
     });
