@@ -9,6 +9,7 @@ import 'package:sqflite/sqflite.dart';
 import 'login/splash_screen.dart';
 import 'habits/habitlist_page.dart';
 import 'habits/addhabit_page.dart';
+import 'notes/listNotesPage.dart';
 
 
 //in json "package_name"
@@ -46,14 +47,96 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      //home: const SplashScreen(),
-      home:
-      //AddNewHabitsPage(),
-      //HabitlistPage(),
-      ListNotesPage(),
+      home: MainApp(),
     );
   }
 }
+
+
+
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  String _pageName = "Home";
+  int _selectedIndex = 0;
+
+  static final List<Widget> _pages = <Widget>[
+    const HabitlistPage(),
+    const ListNotesPage(),
+
+  ];
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_pageName),
+        backgroundColor: Colors.pink,
+      ),
+
+      //SIDE NAV
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            // HEADER
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.pink),
+              child: Image.asset('assets/images/image.jpg'),
+              // Text(
+              //   'FIX HEADER WITH IMAGE!!!!!!!',
+              //   style: TextStyle(color: Colors.white, fontSize: 24),
+              // ),
+            ),
+
+            // ITEMS
+            ListTile(
+                leading: Icon(Icons.home),
+                title: Text('Habits'),
+                onTap: () {
+                  setState(() {
+                    _pageName = 'Habits';
+                    _selectedIndex = 0;
+                  });
+                  Navigator.pop(context);
+                }
+            ),
+            ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Notes'),
+                onTap: () {
+                  setState(() {
+                    _pageName = 'Notes';
+                    _selectedIndex = 1;
+                  });
+                  Navigator.pop(context);
+                }
+            ),
+
+
+
+          ],
+        ),
+      ),
+
+      //PAGE CONTENT
+      body: Expanded(
+        child: _pages.elementAt(_selectedIndex),
+      ),
+    );
+  }
+}
+
+
+
+
+
 
 
 

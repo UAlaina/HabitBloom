@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+import 'package:habittracker/models/dbHelper.dart';
+import 'package:habittracker/tasks/addtask_page.dart';
+
+class TaskListPage extends StatefulWidget {
+  final int habitId;
+
+  const TaskListPage({super.key, required this.habitId});
+
+  @override
+  State<TaskListPage> createState() => _TaskListPageState();
+}
+
+class _TaskListPageState extends State<TaskListPage> {
+  final DbHelper dbHelper = DbHelper();
+  List<Task>? _tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final loadedTasks = await dbHelper.getTasks();
+      setState(() {
+        _tasks = loadedTasks;
+      });
+    } catch (e) {
+      print('Error loading habits: $e');
+    }
+    for (var habit in _tasks!) {
+      print('${habit.toString()}');
+    }
+    print(_tasks);
+    print('\n\n\n\n\n\n\n\n\n\nTEST\n\n\n\n\n\n');
+  }
+
+  void _navigateToAddTaskPage() async {
+    final shouldReload = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddTaskPage()),
+    );
+
+    if (shouldReload == true) {
+      _loadData();
+    }
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('My Habits'),
+      ),
+      body: _tasks == null || _tasks!.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+        padding: EdgeInsets.all(12),
+        itemCount: _tasks!.length,
+        itemBuilder: (context, index) {
+          final task = _tasks![index];
+          return GestureDetector(
+            onTap: () =>
+            {
+              //_navigateToTaskList(habit.id),
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  // if (habit.type != null)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(top: 4),
+                  //     child: Text(
+                  //       'Type: ${habit.type}',
+                  //       style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  //     ),
+                  //   ),
+                  if (task.completed != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        'Repeats: ${task.completed}',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToAddTaskPage,
+        backgroundColor: Colors.grey[400],
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habittracker/models/dbHelper.dart';
 import 'addhabit_page.dart';
-
+import 'package:habittracker/tasks/tasklist_page.dart';
 
 class HabitlistPage extends StatefulWidget {
   const HabitlistPage({super.key});
@@ -48,6 +48,20 @@ class _HabitlistPageState extends State<HabitlistPage> {
   }
 
 
+  void _navigateToTaskList(int habitId) async {
+    final shouldReload = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TaskListPage(habitId: habitId)),
+    );
+
+    if (shouldReload == true) {
+      _loadData();
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +78,7 @@ class _HabitlistPageState extends State<HabitlistPage> {
           return GestureDetector(
             onTap: () =>
             {
-              //_navigateToTaskList(habit.id),
+              _navigateToTaskList(habit.id),
             },
             child: Container(
               margin: EdgeInsets.symmetric(vertical: 8),
@@ -90,14 +104,14 @@ class _HabitlistPageState extends State<HabitlistPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (habit.type != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        'Type: ${habit.type}',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                      ),
-                    ),
+                  // if (habit.type != null)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(top: 4),
+                  //     child: Text(
+                  //       'Type: ${habit.type}',
+                  //       style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                  //     ),
+                  //   ),
                   if (habit.repeatOn != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 2),

@@ -3,6 +3,8 @@ import 'package:habittracker/notes/addnotes_page.dart';
 import 'package:habittracker/models/notesDbHelper.dart';
 
 class ListNotesPage extends StatefulWidget {
+  const ListNotesPage({super.key});
+
   @override
   _ListNotesPageState createState() => _ListNotesPageState();
 }

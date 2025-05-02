@@ -7,20 +7,40 @@ import 'package:sqflite/sqflite.dart';
 class Habit {
   final int id;
   final String name;
-  final String type;
   final String repeatOn; //frequ
 
-  const Habit({required this.id, required this.name, required this.type, required this.repeatOn});
+  const Habit({required this.id, required this.name, required this.repeatOn});
 
   Map<String, Object?> toMap() {
-    return {'id': id, 'name': name, 'type': type, 'repeatOn': repeatOn};
+    return {'id': id, 'name': name, 'repeatOn': repeatOn};
   }
 
   // Implement toString to make it easier to see information about
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'Habit{id: $id, name: $name,type: $type, repeatOn: $repeatOn}';
+    return 'Habit{id: $id, name: $name, repeatOn: $repeatOn}';
+  }
+}
+
+
+class Task {
+  final int id;
+  final int habitId;
+  final String title;
+  final int completed;
+
+  const Task({required this.id, required this.habitId, required this.title, required this.completed});
+
+  Map<String, Object?> toMap() {
+    return {'id': id, 'habitId': habitId, 'title': title, 'completed': completed};
+  }
+
+  // Implement toString to make it easier to see information about
+  // each dog when using the print statement.
+  @override
+  String toString() {
+    return 'Task{id: $id, habitId: $habitId, title: $title, completed: $completed}';
   }
 }
 
@@ -39,6 +59,26 @@ class DbHelper {
       //path
       join(await getDatabasesPath(), 'habit_db.db'),
       //table creation
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE habit(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            repeatOn TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE task(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            habitId INTEGER,
+            title TEXT,
+            completed INTEGER,
+            FOREIGN KEY (habitId) REFERENCES habit(id) ON DELETE CASCADE
+          )
+        ''');
+      },
+      /*
       onCreate: (db, version) {
         // Run the CREATE TABLE statement on the database.
         return db.execute(
@@ -50,6 +90,7 @@ class DbHelper {
       ''',
         );
       },
+      */
       version: 1,
     );
   }
@@ -81,7 +122,6 @@ class DbHelper {
       habits.add(Habit(
         id: map['id'],
         name: map['name'],
-        type: map['type'],
         repeatOn: map['repeatOn'],
       ));
     });
@@ -110,11 +150,75 @@ class DbHelper {
     );
   }
 
+
+
+  //========== TASK ===============
+
+  // INSERT
+  Future<void> insertTask(Task task) async {
+    final db = await database;
+    await db.insert(
+      'habit',
+      {
+        //room.toMap(), //is easy but maps everything including id, which wont AI
+        'habitId': task.habitId,
+        'title': task.title,
+        'completed': task.completed,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // LIST
+  Future<List<Task>> getTasks() async {
+    final db = await database;
+    final List<Map<String, dynamic>> query = await db.query('task');
+
+    List<Task> tasks = [];
+    query.forEach((map) {
+      tasks.add(Task(
+        id: map['id'],
+        habitId: map['habitId'],
+        title: map['title'],
+        completed: map['completed'],
+      ));
+    });
+
+    return tasks;
+  }
+
+  // UPDATE
+  Future<void> updateTask(Task task) async {
+    final db = await database;
+    await db.update(
+      'task',
+      task.toMap(),
+      where: 'id = ?',
+      whereArgs: [task.id],
+    );
+  }
+
+  // DELETE
+  Future<void> deleteTask(int id) async {
+    final db = await database;
+    await db.delete(
+      'task',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+
+
+  //========== GENERAL ===============
+
   //DELETE DB
   Future<void> deleteDB() async {
     final dbPath = join(await getDatabasesPath(), 'habit_db.db');
     await deleteDatabase(dbPath);
   }
+
+
 
 // GUIDE
 /*
