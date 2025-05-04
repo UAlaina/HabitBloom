@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:habittracker/habits/habit_calendar.dart';
 import 'package:habittracker/models/dbHelper.dart';
 import 'package:habittracker/notes/listNotesPage.dart';
 import 'package:sqflite/sqflite.dart';
@@ -68,6 +69,7 @@ class _MainAppState extends State<MainApp> {
   static final List<Widget> _pages = <Widget>[
     const HabitlistPage(),
     const ListNotesPage(),
+    HabitCalendarScreen(),
 
   ];
 
@@ -114,6 +116,17 @@ class _MainAppState extends State<MainApp> {
                   setState(() {
                     _pageName = 'Notes';
                     _selectedIndex = 1;
+                  });
+                  Navigator.pop(context);
+                }
+            ),
+            ListTile(
+                leading: Icon(Icons.calendar_month),
+                title: Text('Calendar'),
+                onTap: () {
+                  setState(() {
+                    _pageName = 'Calendar';
+                    _selectedIndex = 2;
                   });
                   Navigator.pop(context);
                 }
