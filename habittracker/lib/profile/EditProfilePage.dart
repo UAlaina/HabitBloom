@@ -81,7 +81,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             TextField(
               decoration: InputDecoration(
                 labelText: "Email",
-                hintText: user.email,
+                //WARNING: user.email
+                hintText: user!.email,
                 enabled: false,
               ),
             ),
