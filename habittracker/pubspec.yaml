@@ -34,7 +34,7 @@ dependencies:
   cloud_firestore: any
   firebase_core: any
   firebase_core_platform_interface: any
-  #firebase_auth: any
+  firebase_auth: any
   sqflite: any
   path: any
   table_calendar: any

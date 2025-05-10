@@ -1,6 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:habittracker/settings/ChangePasswordPage.dart';
 
 class SettingsPage extends StatefulWidget {
+  final bool isDarkMode;
+  final Function toggleDarkMode;
+
+  const SettingsPage({Key? key, required this.isDarkMode, required this.toggleDarkMode}) : super(key: key);
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -8,20 +15,19 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool dailyReminder = false;
   bool weeklyReminder = false;
-  bool darkMode = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings Page'),
-        backgroundColor: Colors.lightBlue.shade200,
+        // title: const Text('Settings'),
+        // backgroundColor: Colors.pink,
       ),
       body: ListView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         children: [
           ListTile(
-            title: Text('Daily Reminder'),
+            title: const Text('Daily Reminder'),
             trailing: Switch(
               value: dailyReminder,
               activeColor: Colors.lightBlue,
@@ -32,9 +38,9 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
-            title: Text('Weekly Reminder'),
+            title: const Text('Weekly Reminder'),
             trailing: Switch(
               value: weeklyReminder,
               activeColor: Colors.lightBlue,
@@ -45,32 +51,39 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
-            title: Text('Dark Mode'),
+            title: const Text('Dark Mode'),
             trailing: Switch(
-              value: darkMode,
-              activeColor: Colors.lightBlue,
+              value: widget.isDarkMode,
               onChanged: (value) {
-                setState(() {
-                  darkMode = value;
-                });
+                widget.toggleDarkMode();
               },
             ),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
-            title: Text('Change Password'),
-            trailing: Icon(Icons.arrow_forward_ios),
+            title: const Text('Change Password'),
+            trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // Handle change password
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ChangePasswordPage()),
+              );
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Center(
             child: ElevatedButton(
-              onPressed: () {
-                // Handle log out
+              onPressed: () async {
+                try {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error logging out: $e')),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade400,
@@ -78,7 +91,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: Text('Log Out'),
+              child: const Text('Log Out'),
             ),
           ),
         ],

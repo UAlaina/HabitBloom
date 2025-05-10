@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:habittracker/Views/EX_dashboard_page.dart';
 import 'package:habittracker/habits/addhabit_page.dart';
+import 'package:habittracker/homescreen.dart';
 //import 'package:habittracker/views/dashboard_page.dart';
 import 'signup_page.dart';
 
@@ -34,7 +35,15 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           //MaterialPageRoute(builder: (context) => const DashboardPage()),
-          MaterialPageRoute(builder: (context) => AddNewHabitsPage()),
+          MaterialPageRoute(builder: (context) => HomeScreen(
+            isDarkMode: false,
+            toggleDarkMode: () {
+              setState(() {
+                // Logic to toggle dark mode
+              });
+            }
+          ),
+          ),
 
         );
       } else {

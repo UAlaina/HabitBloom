@@ -155,7 +155,7 @@ class _HabitCalendarScreenState extends State<HabitCalendarScreen> {
     TextEditingController _taskController = TextEditingController();
     Color _selectedColor = Colors.blue;
 
-    setState(() {}); // To refresh the UI when the selected color changes.
+    setState(() {});
 
     showDialog(
       context: context,
