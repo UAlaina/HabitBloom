@@ -13,7 +13,8 @@ class AddNewHabitsPage extends StatefulWidget {
 class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
   final DbHelper dbHelper = DbHelper();
   final TextEditingController nameController = TextEditingController();
-  String? selectedFrequency;
+  // String? selectedFrequency;
+  Map<String, String?> selectedValues = {};
 
   Future<void> _addHabit() async {
     if (nameController.text.isEmpty) {
@@ -26,7 +27,7 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
     final habit = Habit(
       id: 0, //is ignored, should auto increment
       name: nameController.text,
-      repeatOn: 'test',
+      repeatOn: selectedValues['Frequency'] ?? 'Weekly',
     );
     //DEBUG
     // final room = Room(
@@ -111,7 +112,7 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {int maxLines = 1}) {
+  Widget _buildTextField(String label, TextEditingController controller,  {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -149,6 +150,7 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
           ),
           child: DropdownButton<String>(
             isExpanded: true,
+            value: selectedValues[label],
             underline: SizedBox(),
             items: options
                 .map((option) => DropdownMenuItem(
@@ -156,7 +158,11 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
               child: Text(option),
             ))
                 .toList(),
-            onChanged: (value) {},
+            onChanged: (value) {
+              setState(() {
+                selectedValues[label] = value;
+              });
+            },
             hint: Text('Select $label'),
           ),
         ),
