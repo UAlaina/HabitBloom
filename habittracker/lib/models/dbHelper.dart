@@ -182,9 +182,31 @@ class DbHelper {
   }
 
   // LIST
-  Future<List<Task>> getTasks() async {
+  Future<List<Task>> getAllTasks() async {
     final db = await database;
     final List<Map<String, dynamic>> query = await db.query('task');
+
+    List<Task> tasks = [];
+    query.forEach((map) {
+      tasks.add(Task(
+        id: map['id'],
+        habitId: map['habitId'],
+        title: map['title'],
+        completed: map['completed'],
+      ));
+    });
+
+    return tasks;
+  }
+
+  // LIST
+  Future<List<Task>> getTasksById(int habitId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> query = await db.query(
+        'task',
+      where: 'habitId = ?',
+      whereArgs: [habitId],
+    );
 
     List<Task> tasks = [];
     query.forEach((map) {

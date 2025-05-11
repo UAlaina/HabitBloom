@@ -23,7 +23,7 @@ class _TaskListPageState extends State<TaskListPage> {
 
   Future<void> _loadData() async {
     try {
-      final loadedTasks = await dbHelper.getTasks();
+      final loadedTasks = await dbHelper.getTasksById(widget.habitId);
       setState(() {
         _tasks = loadedTasks;
       });
