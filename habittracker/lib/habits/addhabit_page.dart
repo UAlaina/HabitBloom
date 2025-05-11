@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habittracker/habits/habitlist_page.dart';
 import 'package:habittracker/models/dbHelper.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:habittracker/models/db_service.dart';
 
 class AddNewHabitsPage extends StatefulWidget {
   const AddNewHabitsPage({super.key});
@@ -11,7 +12,7 @@ class AddNewHabitsPage extends StatefulWidget {
 }
 
 class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
-  final DbHelper dbHelper = DbHelper();
+  final DbHelper dbHelper = DbService().dbHelper;
   final TextEditingController nameController = TextEditingController();
   // String? selectedFrequency;
   Map<String, String?> selectedValues = {};
@@ -39,7 +40,8 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
     // );
 
     try {
-      await dbHelper.insertHabit(habit);
+      //await dbHelper.insertHabit(habit);
+      await DbService().dbHelper.insertHabit(habit);
       //should clear all text controllers
       //clear();
       //await _loadRooms();

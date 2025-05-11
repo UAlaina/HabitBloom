@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _updatePages();
   }
 
+
   void _updatePages() {
     _pages = [
       const HabitlistPage(),

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:habittracker/models/dbHelper.dart';
 import 'addhabit_page.dart';
 import 'package:habittracker/tasks/tasklist_page.dart';
+import 'package:provider/provider.dart';
+import 'package:habittracker/models/user_data.dart';
+import 'package:habittracker/models/db_service.dart';
 
 class HabitlistPage extends StatefulWidget {
   const HabitlistPage({super.key});
@@ -11,29 +14,59 @@ class HabitlistPage extends StatefulWidget {
 }
 
 class _HabitlistPageState extends State<HabitlistPage> {
-  final DbHelper dbHelper = DbHelper();
   List<Habit>? _habits = [];
+  //bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Use Future.microtask to ensure context is available
+    Future.microtask(() => _initializeDb());
+  }
+
+  Future<void> _initializeDb() async {
+    final docId = Provider.of<UserData>(context, listen: false).docId;
+
+    if (docId == null || docId.isEmpty) {
+      print('Error: docId is null or empty');
+      setState(() {
+        //_isLoading = false;
+      });
+      return;
+    }
+
+    print('Initializing DB with docId: $docId');
+
+    try {
+      // Initialize our global DB service
+      await DbService().initialize(docId);
+      _loadData();
+    } catch (e) {
+      print('Error initializing database: $e');
+      setState(() {
+        //_isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadData() async {
     try {
-      final loadedHabits = await dbHelper.getHabits();
+      final loadedHabits = await DbService().dbHelper.getHabits();
       setState(() {
         _habits = loadedHabits;
+        //_isLoading = false;
       });
+      //DEBUG
+      print('Loaded ${loadedHabits.length} habits');
+      for (var habit in _habits!) {
+        print('${habit.toString()}');
+      }
     } catch (e) {
       print('Error loading habits: $e');
+      setState(() {
+        //_isLoading = false;
+      });
     }
-    for (var habit in _habits!) {
-      print('${habit.toString()}');
-    }
-    print(_habits);
-    print('\n\n\n\n\n\n\n\n\n\nTEST\n\n\n\n\n\n');
   }
 
   void _navigateToAddHabitPage() async {
@@ -134,3 +167,19 @@ class _HabitlistPageState extends State<HabitlistPage> {
     );
   }
 }
+
+
+/*
+@override
+  void initState() {
+    super.initState();
+    final docId = Provider.of<UserData>(context, listen: false).docId;
+    print('testi ${docId}');
+    dbHelper = DbHelper(userId: docId);
+    print('testi ${dbHelper.userId}');
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text(docId!)),
+    // );
+    _loadData();
+  }
+ */

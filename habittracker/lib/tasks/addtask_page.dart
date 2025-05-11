@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habittracker/models/dbHelper.dart';
+import 'package:habittracker/models/db_service.dart';
 
 class AddTaskPage extends StatefulWidget {
   final int habitId;
@@ -11,7 +12,7 @@ class AddTaskPage extends StatefulWidget {
 }
 
 class _AddTaskPageState extends State<AddTaskPage> {
-  final DbHelper dbHelper = DbHelper();
+  final DbHelper dbHelper = DbService().dbHelper;
   final TextEditingController titleController = TextEditingController();
 
   Future<void> _addTask() async {
@@ -30,7 +31,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
 
     try {
-      await dbHelper.insertTask(task);
+      await DbService().dbHelper.insertTask(task);
       //should clear all text controllers
       //clear();
       //await _loadRooms();

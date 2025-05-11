@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habittracker/models/dbHelper.dart';
 import 'package:habittracker/tasks/addtask_page.dart';
+import 'package:habittracker/models/db_service.dart';
 
 class TaskListPage extends StatefulWidget {
   final int habitId;
@@ -12,7 +13,7 @@ class TaskListPage extends StatefulWidget {
 }
 
 class _TaskListPageState extends State<TaskListPage> {
-  final DbHelper dbHelper = DbHelper();
+  final DbHelper dbHelper = DbService().dbHelper;
   List<Task>? _tasks = [];
 
   @override
@@ -23,7 +24,8 @@ class _TaskListPageState extends State<TaskListPage> {
 
   Future<void> _loadData() async {
     try {
-      final loadedTasks = await dbHelper.getTasksById(widget.habitId);
+      //final loadedTasks = await dbHelper.getTasksById(widget.habitId);
+      final loadedTasks = await DbService().dbHelper.getTasksById(widget.habitId);
       setState(() {
         _tasks = loadedTasks;
       });
@@ -46,7 +48,8 @@ class _TaskListPageState extends State<TaskListPage> {
     );
 
     try {
-      await dbHelper.updateTask(newTask);
+      //await dbHelper.updateTask(newTask);
+      await DbService().dbHelper.updateTask(newTask);
       await _loadData();
       // ScaffoldMessenger.of(context).showSnackBar(
       //   SnackBar(content: Text('Room updated successfully')),
