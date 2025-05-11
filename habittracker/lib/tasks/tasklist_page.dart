@@ -37,10 +37,31 @@ class _TaskListPageState extends State<TaskListPage> {
     print('\n\n\n\n\n\n\n\n\n\nTEST\n\n\n\n\n\n');
   }
 
+  Future<void> _updateTaskStatus(Task task, int completed) async {
+    final newTask = Task(
+      id: task.id,
+      habitId: task.habitId,
+      title: task.title,
+      completed: completed,
+    );
+
+    try {
+      await dbHelper.updateTask(newTask);
+      await _loadData();
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Room updated successfully')),
+      // );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to updated task: $e')),
+      );
+    }
+  }
+
   void _navigateToAddTaskPage() async {
     final shouldReload = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddTaskPage()),
+      MaterialPageRoute(builder: (context) => AddTaskPage(habitId: widget.habitId)),
     );
 
     if (shouldReload == true) {
@@ -53,7 +74,7 @@ class _TaskListPageState extends State<TaskListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Habits'),
+        title: Text('HABITNAMEHERE'),
       ),
       body: _tasks == null || _tasks!.isEmpty
           ? Center(child: CircularProgressIndicator())
@@ -81,32 +102,40 @@ class _TaskListPageState extends State<TaskListPage> {
                   ),
                 ],
               ),
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    task.title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  //CHECKBOX
+                  Checkbox(
+                    value: task.isCompleted,
+                    onChanged: (bool? value) async {
+                      setState(() {
+                        task.completed = value ?? false ? 1 : 0;
+                      });
+                      await _updateTaskStatus(task, task.completed);
+                    },
                   ),
-                  // if (habit.type != null)
-                  //   Padding(
-                  //     padding: const EdgeInsets.only(top: 4),
-                  //     child: Text(
-                  //       'Type: ${habit.type}',
-                  //       style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                  //     ),
-                  //   ),
-                  if (task.completed != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        'Repeats: ${task.completed}',
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  //TEXT
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        task.title,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                      if (task.completed != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            'Completed: ${task.completed}',
+                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),

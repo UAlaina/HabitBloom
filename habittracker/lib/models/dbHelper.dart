@@ -28,13 +28,25 @@ class Task {
   final int id;
   final int habitId;
   final String title;
-  final int completed;
+  int completed;
 
-  const Task({required this.id, required this.habitId, required this.title, required this.completed});
+  Task({required this.id, required this.habitId, required this.title, required this.completed});
 
   Map<String, Object?> toMap() {
     return {'id': id, 'habitId': habitId, 'title': title, 'completed': completed};
   }
+
+  bool get isCompleted => completed == 1;
+  set isCompleted(bool value) {
+    completed = value ? 1 : 0;
+  }
+  // bool isCompleted() {
+  //   if (completed == 1) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   // Implement toString to make it easier to see information about
   // each dog when using the print statement.
@@ -158,7 +170,7 @@ class DbHelper {
   Future<void> insertTask(Task task) async {
     final db = await database;
     await db.insert(
-      'habit',
+      'task',
       {
         //room.toMap(), //is easy but maps everything including id, which wont AI
         'habitId': task.habitId,

@@ -1,16 +1,119 @@
 import 'package:flutter/material.dart';
+import 'package:habittracker/models/dbHelper.dart';
 
 class AddTaskPage extends StatefulWidget {
-  const AddTaskPage({super.key});
+  final int habitId;
+
+  const AddTaskPage({super.key, required this.habitId});
 
   @override
   State<AddTaskPage> createState() => _AddTaskPageState();
 }
 
 class _AddTaskPageState extends State<AddTaskPage> {
+  final DbHelper dbHelper = DbHelper();
+  final TextEditingController titleController = TextEditingController();
+
+  Future<void> _addTask() async {
+    if (titleController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Name cannot be empty')),
+      );
+      return;
+    }
+
+    final task = Task(
+      id: 0, //is ignored, should auto increment
+      habitId: widget.habitId,
+      title: titleController.text,
+      completed: 0,
+    );
+
+    try {
+      await dbHelper.insertTask(task);
+      //should clear all text controllers
+      //clear();
+      //await _loadRooms();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Task added successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add task: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add New Tasks'),
+        backgroundColor: Colors.grey[200],
+        foregroundColor: Colors.black,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            //name
+            _buildTextField('Task Name', titleController),
+            SizedBox(height: 16),
+            Spacer(),
+            Center(
+              child: ElevatedButton(
+                onPressed: () async {
+                  await _addTask();
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => HabitlistPage()),
+                  // );
+                  Navigator.pop(context, true);
+                },
+                child: Text('Submit', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  //primary: Colors.grey[600],
+                  //onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
+
+
+  Widget _buildTextField(String label, TextEditingController controller,  {int maxLines = 1}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
 }
 
