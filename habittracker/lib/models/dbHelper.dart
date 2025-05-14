@@ -29,11 +29,12 @@ class Task {
   final int habitId;
   final String title;
   int completed;
+  int startTime;
 
-  Task({required this.id, required this.habitId, required this.title, required this.completed});
+  Task({required this.id, required this.habitId, required this.title, required this.completed, required this.startTime});
 
   Map<String, Object?> toMap() {
-    return {'id': id, 'habitId': habitId, 'title': title, 'completed': completed};
+    return {'id': id, 'habitId': habitId, 'title': title, 'completed': completed, 'startTime': startTime};
   }
 
   bool get isCompleted => completed == 1;
@@ -52,7 +53,7 @@ class Task {
   // each dog when using the print statement.
   @override
   String toString() {
-    return 'Task{id: $id, habitId: $habitId, title: $title, completed: $completed}';
+    return 'Task{id: $id, habitId: $habitId, title: $title, completed: $completed, startTime: $startTime}';
   }
 }
 
@@ -60,18 +61,18 @@ class Task {
 class Report {
   final int id;
   final int score;
-  final int startDate;
+  final int startTime;
   final String interval;
 
-  const Report({required this.id, required this.score, required this.startDate, required this.interval});
+  const Report({required this.id, required this.score, required this.startTime, required this.interval});
 
   Map<String, Object?> toMap() {
-    return {'id': id, 'score': score, 'startDate': startDate, 'interval': interval};
+    return {'id': id, 'score': score, 'startTime': startTime, 'interval': interval};
   }
 
   @override
   String toString() {
-    return 'Task{id: $id, score: $score, startDate: $startDate, interval: $interval}';
+    return 'Task{id: $id, score: $score, startTime: $startTime, interval: $interval}';
   }
 }
 
@@ -142,6 +143,7 @@ class DbHelper {
             habitId INTEGER,
             title TEXT,
             completed INTEGER,
+            startTime INTEGER,
             FOREIGN KEY (habitId) REFERENCES habit(id) ON DELETE CASCADE
           )
         ''');
@@ -150,7 +152,7 @@ class DbHelper {
           CREATE TABLE report(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             score INTEGER,
-            startDate TEXT,
+            startTime INTEGER,
             interval TEXT
           )
         ''');
@@ -206,6 +208,23 @@ class DbHelper {
     return habits;
   }
 
+  // LIST
+  Future<Habit> getHabitById(int habitId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> query = await db.query(
+      'habit',
+      where: 'id = ?', // use the actual primary key
+      whereArgs: [habitId],
+    );
+
+    final map = query.first;
+    return Habit(
+      id: map['id'],
+      name: map['name'],
+      repeatOn: map['repeatOn'],
+    );
+  }
+
   // UPDATE
   Future<void> updateHabit(Habit habit) async {
     final db = await database;
@@ -241,6 +260,7 @@ class DbHelper {
         'habitId': task.habitId,
         'title': task.title,
         'completed': task.completed,
+        'startTime': task.startTime,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -258,10 +278,37 @@ class DbHelper {
         habitId: map['habitId'],
         title: map['title'],
         completed: map['completed'],
+        startTime: map['startTime'],
       ));
     });
 
     return tasks;
+  }
+
+  // LIST
+  Future<List<Task>> getTasksByInterval(String interval) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> query = await db.rawQuery('''
+      SELECT task.*
+      FROM task
+      JOIN habit ON task.habitId = habit.id
+      WHERE habit.repeatOn = ?
+    ''', [interval]);
+
+    // final List<Map<String, dynamic>> query = await db.query(
+    //   'task',
+    //   where: 'repeatOn = ?', // Use parameterized query to avoid SQL injection
+    //   whereArgs: [interval],
+    // );
+
+    return query.map((map) => Task(
+      id: map['id'],
+      habitId: map['habitId'],
+      title: map['title'],
+      completed: map['completed'],
+      startTime: map['startTime'],
+    )).toList();
   }
 
   // LIST
@@ -280,6 +327,7 @@ class DbHelper {
         habitId: map['habitId'],
         title: map['title'],
         completed: map['completed'],
+        startTime: map['startTime'],
       ));
     });
 
@@ -321,7 +369,7 @@ class DbHelper {
       {
         //room.toMap(), //is easy but maps everything including id, which wont AI
         'score': report.score,
-        'startDate': report.startDate,
+        'startTime': report.startTime,
         'interval': report.interval
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -341,7 +389,7 @@ class DbHelper {
     return query.map((map) => Report(
       id: map['id'],
       score: map['score'],
-      startDate: map['startDate'],
+      startTime: map['startTime'],
       interval: map['interval'],
     )).toList();
   }
@@ -380,8 +428,8 @@ class DbHelper {
   //========== GENERAL ===============
 
   //DELETE DB
-  Future<void> deleteDB() async {
-    final dbPath = join(await getDatabasesPath(), 'habit_db.db');
+  static Future<void> deleteDB(String userId) async {
+    final dbPath = join(await getDatabasesPath(), 'habit_db_${userId}.db');
     await deleteDatabase(dbPath);
   }
 

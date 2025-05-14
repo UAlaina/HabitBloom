@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_pageName),
-        backgroundColor: widget.isDarkMode ? Colors.grey[900] : Colors.pink,
+        backgroundColor: widget.isDarkMode ? Colors.grey[900] : Colors.pinkAccent,
       ),
       drawer: Drawer(
         child: Container(
@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               DrawerHeader(
                 decoration: BoxDecoration(
-                  color: widget.isDarkMode ? Colors.grey[900] : Colors.pink,
+                  color: widget.isDarkMode ? Colors.grey[900] : Colors.pinkAccent,
                 ),
                 child: Image.asset('assets/habit_tracker_icon.png'),
               ),

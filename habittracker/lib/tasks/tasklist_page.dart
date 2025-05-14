@@ -45,6 +45,7 @@ class _TaskListPageState extends State<TaskListPage> {
       habitId: task.habitId,
       title: task.title,
       completed: completed,
+      startTime: task.startTime,
     );
 
     try {
@@ -60,6 +61,22 @@ class _TaskListPageState extends State<TaskListPage> {
       );
     }
   }
+
+  Future<void> _deleteTask(int id) async {
+    try {
+      await DbService().dbHelper.deleteTask(id);
+      await _loadData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Task deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete task: $e')),
+      );
+    }
+  }
+
+
 
   void _navigateToAddTaskPage() async {
     final shouldReload = await Navigator.push(
@@ -106,41 +123,62 @@ class _TaskListPageState extends State<TaskListPage> {
                 ],
               ),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  //CHECKBOX
-                  Checkbox(
-                    value: task.isCompleted,
-                    onChanged: (bool? value) async {
-                      setState(() {
-                        task.completed = value ?? false ? 1 : 0;
-                      });
-                      await _updateTaskStatus(task, task.completed);
-                    },
-                  ),
-                  //TEXT
-                  Column(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        task.title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      //CHECKBOX
+                      Checkbox(
+                        value: task.isCompleted,
+                        onChanged: (bool? value) async {
+                          setState(() {
+                            task.completed = value ?? false ? 1 : 0;
+                          });
+                          await _updateTaskStatus(task, task.completed);
+                        },
                       ),
-                      if (task.completed != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            'Completed: ${task.completed}',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      //TEXT
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            task.title,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
+                          if (task.completed != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                'Completed: ${task.completed}',
+                                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      //DELETE BUTTON
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          await _deleteTask(task.id);
+                          setState(() {
+                            _tasks!.removeAt(index);
+                          });
+                        },
+                      ),
                     ],
                   ),
                 ],
               ),
+
+
             ),
           );
         },

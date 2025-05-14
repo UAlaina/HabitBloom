@@ -17,6 +17,9 @@ class DateCheckService {
     print('[!Service] Initialized with interval: ${interval.inSeconds} seconds');
     final DbHelper dbHelper = DbService().dbHelper;
     print('!MADE IT');
+    runDateCheck();
+
+
 
     _timer?.cancel(); // clear previous timer if any
 
@@ -32,14 +35,109 @@ class DateCheckService {
 
 
   void runDateCheck() {
+    print('[!rundatecheck] start');
+    dateCheck('Daily');
+    dateCheck('Weekly');
+    dateCheck('Monthly');
+    print('[!rundatecheck] end');
+  }
+
+  Future<void> dateCheck(String intervalString) async {
+    int interval;
+
+    switch (intervalString) {
+      case 'Daily':
+        interval = 24 * 60 * 60 * 1000; //24hrs
+        break;
+      case 'Weekly':
+        interval = 7 * 24 * 60 * 60 * 1000; //7days
+        break;
+      case 'Monthly':
+        interval = 30 * 24 * 60 * 60 * 1000; //30days
+        break;
+      default:
+        print('[!Intervalswitch] wrong value (d|w|m)');
+        return;
+    }
+
+    print('[!datecheck] left switch with $interval');
+    List<Task>? tasks = await DbService().dbHelper.getTasksByInterval(intervalString);
+
+    int completeCount = 0;
+    for (var task in tasks) {
+      print('[!printtask] $intervalString $task');
+      if (task.completed == 1) {
+        completeCount++;
+      }
+
+    }
+
+
 
   }
+
+
+
+  //========= STATIC TIME FUNCTIONS ============
+  static DateTime startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
+
+  static DateTime startOfWeek(DateTime date) {
+    int difference = date.weekday - DateTime.monday;
+    DateTime monday = date.subtract(Duration(days: difference));
+    return DateTime(monday.year, monday.month, monday.day);
+  }
+
+  static DateTime startOfMonth(DateTime date) => DateTime(date.year, date.month, 1);
+
 
 
 
 
 
 }
+
+
+
+
+
+
+//fetching from db (UNIX timemillis) (int)
+// DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(millisFromDb);
+
+//converting datenow to millis
+// DateTime now = DateTime.now();
+// int unixMillis = now.millisecondsSinceEpoch;
+
+/*
+//substracting date time
+void main() {
+  DateTime start = DateTime.now().subtract(Duration(hours: 20));
+  DateTime now = DateTime.now();
+
+  Duration difference = now.difference(start);
+  print(difference); // Output: 20:00:00.000000
+}
+
+//compare directly
+if (now.isAfter(start)) {
+print('Now is after start');
+}
+
+if (now.isBefore(start)) {
+print('Now is before start');
+}
+
+if (now.isAtSameMomentAs(start)) {
+print('They are exactly equal');
+}
+
+//compare against duration
+if (now.difference(start) < Duration(hours: 24)) {
+print('Less than a day has passed');
+}
+//or
+final withinDay = now.difference(start).inHours < 24;
+*/
 
 
 

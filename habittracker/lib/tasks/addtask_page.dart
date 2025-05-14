@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habittracker/models/dbHelper.dart';
 import 'package:habittracker/models/db_service.dart';
+import 'package:habittracker/time/date_check_service.dart';
 
 class AddTaskPage extends StatefulWidget {
   final int habitId;
@@ -23,11 +24,34 @@ class _AddTaskPageState extends State<AddTaskPage> {
       return;
     }
 
+    final currentHabit = await DbService().dbHelper.getHabitById(widget.habitId);
+
+    DateTime now = DateTime.now();
+    DateTime alignedTime = now; //placeholder
+    switch (currentHabit.repeatOn) {
+      case 'Daily':
+        //interval = 24 * 60 * 60 * 1000; //24hrs
+        alignedTime = DateCheckService.startOfDay(now);
+        break;
+      case 'Weekly':
+        //interval = 7 * 24 * 60 * 60 * 1000; //7days
+        alignedTime = DateCheckService.startOfWeek(now);
+        break;
+      case 'Monthly':
+        //interval = 30 * 24 * 60 * 60 * 1000; //30days
+        alignedTime = DateCheckService.startOfMonth(now);
+        break;
+      default:
+        print('[!Intervalswitch] wrong value (d|w|m)');
+        return;
+    }
+
     final task = Task(
       id: 0, //is ignored, should auto increment
       habitId: widget.habitId,
       title: titleController.text,
       completed: 0,
+      startTime: alignedTime.millisecondsSinceEpoch,
     );
 
     try {

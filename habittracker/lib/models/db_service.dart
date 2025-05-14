@@ -18,6 +18,9 @@ class DbService {
   Future<void> initialize(String userId) async {
     if (_dbHelper == null || _currentUserId != userId) {
       _currentUserId = userId;
+      //!EXP Delete DB
+      //await DbHelper.deleteDB(userId);
+      //print('[!deleted] db');
       _dbHelper = DbHelper(userId: userId);
       print('DbService initialized with userId: $userId');
 
