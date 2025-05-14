@@ -7,6 +7,7 @@ import 'package:habittracker/profile/profile_page.dart';
 import 'package:habittracker/settings/settings_page.dart';
 
 import 'time/date_check_service.dart';
+import 'package:habittracker/models/db_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -33,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _updatePages();
     // Initialize the date service
+    //await DbService().ensureInitialized(userId);
     DateCheckService().initialize(interval: Duration(seconds: 5),);
   }
 

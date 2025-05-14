@@ -34,6 +34,15 @@ class DbService {
     return _dbHelper!;
   }
 
+  //EXP
+  bool _isInitialized = false;
+  Future<void> ensureInitialized(String userId) async {
+    if (_isInitialized) return;
+    _dbHelper = DbHelper(userId: userId);
+    _isInitialized = true;
+    print('[DbService] Initialized for user $userId');
+  }
+
   Future<void> addHabit(Habit habit) async {
     await dbHelper.insertHabit(habit);
   }

@@ -44,7 +44,8 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('docID: ${docId}')),
         );
-
+        //EXP WARNING: might not init properly
+        await DbService().initialize(docId);
         Navigator.pushReplacement(
           context,
           //MaterialPageRoute(builder: (context) => const DashboardPage()),
@@ -108,69 +109,164 @@ class _LoginPageState extends State<LoginPage> {
 
 
 
-class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
+// class AuthWrapper extends StatefulWidget {
+//   const AuthWrapper({super.key});
+//
+//   @override
+//   State<AuthWrapper> createState() => _AuthWrapperState();
+// }
+//
+// class _AuthWrapperState extends State<AuthWrapper> {
+//   @override
+//   Widget build(BuildContext context) {
+//     print('!EXP2');
+//     return StreamBuilder<User?>(
+//       stream: FirebaseAuth.instance.authStateChanges(),
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.active) {
+//           User? user = snapshot.data;
+//           print('!EXP HERE1');
+//           if (user != null) {
+//             // User is signed in, but now we'll wait for initialization
+//             print('!EXP HERE');
+//             return FutureBuilder<void>(
+//               future: _initializeUserData(context, user),
+//               builder: (context, asyncSnapshot) {
+//                 if (asyncSnapshot.connectionState == ConnectionState.done) {
+//                   // Initialization is complete, now show HomeScreen
+//                   return HomeScreen(
+//                     isDarkMode: false,
+//                     toggleDarkMode: () {
+//                       setState(() {
+//                         // Logic to toggle dark mode
+//                       });
+//                     },
+//                   );
+//                 } else {
+//                   // Still initializing, show loading
+//                   return Scaffold(
+//                     body: Center(
+//                       child: Column(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           CircularProgressIndicator(),
+//                           SizedBox(height: 16),
+//                           Text("Initializing app data..."),
+//                         ],
+//                       ),
+//                     ),
+//                   );
+//                 }
+//               },
+//             );
+//           } else {
+//             // User is not signed in
+//             return LoginPage();
+//           }
+//         }
+//
+//         // Loading state
+//         return Scaffold(
+//           body: Center(
+//             child: CircularProgressIndicator(),
+//           ),
+//         );
+//       },
+//     );
+//   }
+//
+//   Future<void> _initializeUserData(BuildContext context, User user) async {
+//     final userData = Provider.of<UserData>(context, listen: false);
+//
+//     // Set user data in provider
+//     //Provider.of<UserData>(context, listen: false).setDocId('etsydu');
+//     userData.setDocId(user.uid);
+//
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('user.uid ${user.uid}')),
+//     );
+//
+//     try {
+//       // Initialize DB service with user ID
+//       await DbService().initialize(user.uid);
+//       // DbService().dbHelper.deleteDB(); //////////////////THIS LINE
+//       print('DB service initialized for user: ${user.uid}');
+//     } catch (e) {
+//       print('Error initializing DB service: $e');
+//     }
+//   }
+//
+// }
 
-  @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
-}
 
-class _AuthWrapperState extends State<AuthWrapper> {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          User? user = snapshot.data;
 
-          if (user != null) {
-            // User is signed in
-            // Initialize user data and DB service
-            _initializeUserData(context, user); //I want this line to run completely
-            return HomeScreen(
-                isDarkMode: false,
-                toggleDarkMode: () {
-                  setState(() {
-                    // Logic to toggle dark mode
-                  });
-                }
-            ); //This should only run when prev line is done
-          } else {
-            // User is not signed in
-            return LoginPage(); // Your login screen
-          }
-        }
 
-        // Loading state
-        return Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      },
-    );
-  }
 
-  Future<void> _initializeUserData(BuildContext context, User user) async {
-    final userData = Provider.of<UserData>(context, listen: false);
 
-    // Set user data in provider
-    //Provider.of<UserData>(context, listen: false).setDocId('etsydu');
-    userData.setDocId(user.uid);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('user.uid ${user.uid}')),
-    );
-
-    try {
-      // Initialize DB service with user ID
-      await DbService().initialize(user.uid);
-      // DbService().dbHelper.deleteDB(); //////////////////THIS LINE
-      print('DB service initialized for user: ${user.uid}');
-    } catch (e) {
-      print('Error initializing DB service: $e');
-    }
-  }
-
-}
+//
+// class AuthWrapper extends StatefulWidget {
+//   const AuthWrapper({super.key});
+//
+//   @override
+//   State<AuthWrapper> createState() => _AuthWrapperState();
+// }
+//
+// class _AuthWrapperState extends State<AuthWrapper> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return StreamBuilder<User?>(
+//       stream: FirebaseAuth.instance.authStateChanges(),
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.active) {
+//           User? user = snapshot.data;
+//
+//           if (user != null) {
+//             // User is signed in
+//             // Initialize user data and DB service
+//             _initializeUserData(context, user); //I want this line to run completely
+//             return HomeScreen(
+//                 isDarkMode: false,
+//                 toggleDarkMode: () {
+//                   setState(() {
+//                     // Logic to toggle dark mode
+//                   });
+//                 }
+//             ); //This should only run when prev line is done
+//           } else {
+//             // User is not signed in
+//             return LoginPage(); // Your login screen
+//           }
+//         }
+//
+//         // Loading state
+//         return Scaffold(
+//           body: Center(
+//             child: CircularProgressIndicator(),
+//           ),
+//         );
+//       },
+//     );
+//   }
+//
+//   Future<void> _initializeUserData(BuildContext context, User user) async {
+//     final userData = Provider.of<UserData>(context, listen: false);
+//
+//     // Set user data in provider
+//     //Provider.of<UserData>(context, listen: false).setDocId('etsydu');
+//     userData.setDocId(user.uid);
+//
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('user.uid ${user.uid}')),
+//     );
+//
+//     try {
+//       // Initialize DB service with user ID
+//       await DbService().initialize(user.uid);
+//       // DbService().dbHelper.deleteDB(); //////////////////THIS LINE
+//       print('DB service initialized for user: ${user.uid}');
+//     } catch (e) {
+//       print('Error initializing DB service: $e');
+//     }
+//   }
+//
+// }

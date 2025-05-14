@@ -15,7 +15,8 @@ class DateCheckService {
 
   void initialize({Duration interval = const Duration(seconds: 5)}) {
     print('[!Service] Initialized with interval: ${interval.inSeconds} seconds');
-    //final DbHelper dbHelper = DbService().dbHelper;
+    final DbHelper dbHelper = DbService().dbHelper;
+    print('!MADE IT');
 
     _timer?.cancel(); // clear previous timer if any
 
