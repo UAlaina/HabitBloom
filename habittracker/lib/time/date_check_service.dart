@@ -43,17 +43,22 @@ class DateCheckService {
   }
 
   Future<void> dateCheck(String intervalString) async {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
     int interval;
+    DateTime startOf;
 
     switch (intervalString) {
       case 'Daily':
         interval = 24 * 60 * 60 * 1000; //24hrs
+        startOf = startOfDay(DateTime.now());
         break;
       case 'Weekly':
         interval = 7 * 24 * 60 * 60 * 1000; //7days
+        startOf = startOfWeek(DateTime.now());
         break;
       case 'Monthly':
         interval = 30 * 24 * 60 * 60 * 1000; //30days
+        startOf = startOfMonth(DateTime.now());
         break;
       default:
         print('[!Intervalswitch] wrong value (d|w|m)');
@@ -64,16 +69,53 @@ class DateCheckService {
     List<Task>? tasks = await DbService().dbHelper.getTasksByInterval(intervalString);
 
     int completeCount = 0;
+    int totalTaskCount = 0;
+    int lateTasks = 0;
+
     for (var task in tasks) {
       print('[!printtask] $intervalString $task');
-      if (task.completed == 1) {
-        completeCount++;
+      if ((currentTime - task.startTime) > interval) {
+        if (task.completed == 1) {
+          completeCount++;
+        }
+        //update task
+        task.completed = 0;
+        task.startTime += interval;
+        await DbService().dbHelper.updateTask(task);
+        lateTasks++;
       }
-
+      totalTaskCount++;
     }
+    if (lateTasks <= 0) {
+      print('![!late] no tasks are late!');
+      return;
+    }
+    print('[!late] we have $lateTasks late tasks');
+    double completePercent = completeCount/totalTaskCount;
+    if (completePercent.isNaN) {
+      completePercent = 0;
+    }
+    //generate report
+    await generateReport(completePercent, startOf, intervalString);
+    //repeat until caught up
+    dateCheck(intervalString);
+  }
 
+  Future<void> generateReport(double completePercent, DateTime startOf, String intervalString) async {
+    int startTime = startOf.millisecondsSinceEpoch;
+    final report = Report(
+      id: 0, //is ignored, should auto increment
+      score: completePercent,
+      startTime: startTime,
+      interval: intervalString,
+    );
 
-
+    try {
+      await DbService().dbHelper.insertReport(report);
+      print('[!report] ADDED success!!');
+    } catch (e) {
+      print('[!report] fail');
+    }
   }
 
 

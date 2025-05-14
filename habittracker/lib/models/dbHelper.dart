@@ -60,7 +60,7 @@ class Task {
 
 class Report {
   final int id;
-  final int score;
+  final double score;
   final int startTime;
   final String interval;
 
@@ -151,7 +151,7 @@ class DbHelper {
         await db.execute('''
           CREATE TABLE report(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            score INTEGER,
+            score REAL,
             startTime INTEGER,
             interval TEXT
           )
