@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
+import 'package:habittracker/models/db_service.dart';
+import 'package:habittracker/models/dbHelper.dart';
+
 class DateCheckService {
   // Singleton setup
   static final DateCheckService _instance = DateCheckService._internal();
@@ -12,6 +15,7 @@ class DateCheckService {
 
   void initialize({Duration interval = const Duration(seconds: 5)}) {
     print('[!Service] Initialized with interval: ${interval.inSeconds} seconds');
+    //final DbHelper dbHelper = DbService().dbHelper;
 
     _timer?.cancel(); // clear previous timer if any
 
@@ -24,7 +28,19 @@ class DateCheckService {
     _timer?.cancel();
     print('[!Service] Disposed');
   }
+
+
+  void runDateCheck() {
+
+  }
+
+
+
+
+
 }
+
+
 
 
 

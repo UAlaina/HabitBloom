@@ -107,6 +107,7 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 
+
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
@@ -126,7 +127,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           if (user != null) {
             // User is signed in
             // Initialize user data and DB service
-            _initializeUserData(context, user);
+            _initializeUserData(context, user); //I want this line to run completely
             return HomeScreen(
                 isDarkMode: false,
                 toggleDarkMode: () {
@@ -134,7 +135,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
                     // Logic to toggle dark mode
                   });
                 }
-            );
+            ); //This should only run when prev line is done
           } else {
             // User is not signed in
             return LoginPage(); // Your login screen
@@ -165,6 +166,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     try {
       // Initialize DB service with user ID
       await DbService().initialize(user.uid);
+      // DbService().dbHelper.deleteDB(); //////////////////THIS LINE
       print('DB service initialized for user: ${user.uid}');
     } catch (e) {
       print('Error initializing DB service: $e');
