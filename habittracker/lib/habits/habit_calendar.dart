@@ -11,7 +11,7 @@ class _HabitCalendarScreenState extends State<HabitCalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
-  Map<DateTime, List<Map<String, dynamic>>> _tasks = {};
+  Map<DateTime, Map<String, List<Map<String, dynamic>>>> _tasks = {};
 
   @override
   void initState() {
@@ -33,34 +33,68 @@ class _HabitCalendarScreenState extends State<HabitCalendarScreen> {
     setState(() {
       _tasks = {
         for (var doc in querySnapshot.docs)
-          DateTime.parse(doc.id): List<Map<String, dynamic>>.from(doc['tasks']),
+          DateTime.parse(doc.id): {
+            'daily': List<Map<String, dynamic>>.from(doc['daily'] ?? []),
+            'weekly': List<Map<String, dynamic>>.from(doc['weekly'] ?? []),
+            'monthly': List<Map<String, dynamic>>.from(doc['monthly'] ?? []),
+          }
       };
     });
   }
 
-  void _addTask(DateTime date, String name, Color color) async {
+  void _addTask(String type, DateTime date, String name) async {
+    Color color;
+    switch (type) {
+      case 'daily':
+        color = Colors.blue.shade100;
+        break;
+      case 'weekly':
+        color = Colors.green.shade100;
+        break;
+      case 'monthly':
+        color = Colors.orange.shade100;
+        break;
+      default:
+        color = Colors.blue.shade100; // Default to blue if no type selected
+    }
+
     final formattedDate = _formatDate(date);
-    final task = {'name': name, 'color': color.value};
+    final task = {'name': name, 'color': color.value, 'completed': false};
 
     final docRef = FirebaseFirestore.instance.collection('tasks').doc(formattedDate);
     final docSnapshot = await docRef.get();
 
     if (docSnapshot.exists) {
       await docRef.update({
-        'tasks': FieldValue.arrayUnion([task]),
+        type: FieldValue.arrayUnion([task]),
       });
     } else {
       await docRef.set({
-        'tasks': [task],
+        'daily': [],
+        'weekly': [],
+        'monthly': [],
+        type: [task],
       });
     }
 
     setState(() {
-      if (_tasks[date] != null) {
-        _tasks[date]!.add(task);
-      } else {
-        _tasks[date] = [task];
-      }
+      _tasks[date] ??= {'daily': [], 'weekly': [], 'monthly': []};
+      _tasks[date]![type]!.add(task);
+    });
+  }
+
+  void _toggleTaskCompletion(DateTime date, String type, int index) async {
+    final formattedDate = _formatDate(date);
+    final task = _tasks[date]![type]![index];
+    task['completed'] = !task['completed'];
+
+    final docRef = FirebaseFirestore.instance.collection('tasks').doc(formattedDate);
+    await docRef.update({
+      type: _tasks[date]![type],
+    });
+
+    setState(() {
+      _tasks[date]![type]![index] = task;
     });
   }
 
@@ -93,24 +127,28 @@ class _HabitCalendarScreenState extends State<HabitCalendarScreen> {
               _focusedDay = focusedDay;
               _loadTasksForMonth(focusedDay);
             },
-            eventLoader: (day) => _tasks[day]?.map((task) => task['name']).toList() ?? [],
+            eventLoader: (day) {
+              final tasks = _tasks[day] ?? {};
+              return [...tasks['daily'] ?? [], ...tasks['weekly'] ?? [], ...tasks['monthly'] ?? []];
+            },
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
-                if (events.isNotEmpty) {
+                final tasks = _tasks[date];
+                if (tasks != null) {
+                  final dailyDot = tasks['daily']?.any((task) => !task['completed']) ?? false;
+                  final weeklyDot = tasks['weekly']?.any((task) => !task['completed']) ?? false;
+                  final monthlyDot = tasks['monthly']?.any((task) => !task['completed']) ?? false;
+
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: _tasks[date]!.map((task) {
-                      final color = Color(task['color']);
-                      return Container(
-                        margin: EdgeInsets.symmetric(horizontal: 1.5),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                        ),
-                      );
-                    }).toList(),
+                    children: [
+                      if (dailyDot)
+                        _buildDot(Colors.blue.shade100),
+                      if (weeklyDot)
+                        _buildDot(Colors.green.shade100),
+                      if (monthlyDot)
+                        _buildDot(Colors.orange.shade100),
+                    ],
                   );
                 }
                 return null;
@@ -118,32 +156,19 @@ class _HabitCalendarScreenState extends State<HabitCalendarScreen> {
             ),
           ),
           Expanded(
-            child: ListView(
-              children: (_tasks[_selectedDay] ?? [])
-                  .map((task) => ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Color(task['color']),
-                ),
-                title: Text(task['name']),
-              ))
-                  .toList(),
+            child: Column(
+              children: [
+                _buildTaskTable('daily', Colors.blue.shade100),
+                _buildTaskTable('weekly', Colors.green.shade100),
+                _buildTaskTable('monthly', Colors.orange.shade100),
+              ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: () => _addTaskDialog(),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                backgroundColor: Colors.blueAccent,
-              ),
-              child: Text(
-                'Add Habit',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
+              onPressed: _addTaskDialog,
+              child: Text('Add Habit'),
             ),
           ),
         ],
@@ -151,89 +176,82 @@ class _HabitCalendarScreenState extends State<HabitCalendarScreen> {
     );
   }
 
-  void _addTaskDialog() {
-    TextEditingController _taskController = TextEditingController();
-    Color _selectedColor = Colors.blue;
-
-    setState(() {});
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text("Add Habit"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _taskController,
-                  decoration: InputDecoration(hintText: "Enter Habit"),
-                ),
-                SizedBox(height: 16),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    _buildColorOption(Colors.blue, () {
-                      setState(() => _selectedColor = Colors.blue);
-                    }, _selectedColor == Colors.blue),
-                    _buildColorOption(Colors.green, () {
-                      setState(() => _selectedColor = Colors.green);
-                    }, _selectedColor == Colors.green),
-                    _buildColorOption(Colors.orange, () {
-                      setState(() => _selectedColor = Colors.orange);
-                    }, _selectedColor == Colors.orange),
-                    _buildColorOption(Colors.purple, () {
-                      setState(() => _selectedColor = Colors.purple);
-                    }, _selectedColor == Colors.purple),
-                  ],
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: Text("Cancel"),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                child: Text("Add"),
-                onPressed: () {
-                  if (_taskController.text.isEmpty) return;
-                  _addTask(_selectedDay, _taskController.text, _selectedColor);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
+  Widget _buildDot(Color color) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 2),
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
       ),
     );
   }
 
-  Widget _buildColorOption(Color color, VoidCallback onTap, bool isSelected) {
-    return GestureDetector(
-      onTap: onTap,
+  Widget _buildTaskTable(String type, Color color) {
+    final tasks = _tasks[_selectedDay]?[type] ?? [];
+    return Expanded(
       child: Container(
-        width: 36,
-        height: 36,
-        margin: EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isSelected ? Colors.black : Colors.transparent,
-            width: 3,
-          ),
-          boxShadow: [
-            if (isSelected)
-              BoxShadow(
-                color: color.withOpacity(0.6),
-                blurRadius: 6,
-                spreadRadius: 1,
-              ),
-          ],
+        color: color,
+        child: ListView.builder(
+          itemCount: tasks.length,
+          itemBuilder: (context, index) {
+            final task = tasks[index];
+            return CheckboxListTile(
+              title: Text(task['name']),
+              value: task['completed'],
+              onChanged: (_) => _toggleTaskCompletion(_selectedDay, type, index),
+            );
+          },
         ),
       ),
+    );
+  }
+
+  void _addTaskDialog() {
+    TextEditingController _taskController = TextEditingController();
+    String _selectedType = 'daily';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add Habit"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _taskController,
+                decoration: InputDecoration(hintText: "Enter Habit"),
+              ),
+              DropdownButton<String>(
+                value: _selectedType,
+                items: [
+                  DropdownMenuItem(value: 'daily', child: Text('Daily')),
+                  DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
+                  DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
+                ],
+                onChanged: (value) => setState(() => _selectedType = value!),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text("Add"),
+              onPressed: () {
+                if (_taskController.text.isNotEmpty) {
+                  _addTask(_selectedType, _selectedDay, _taskController.text);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
