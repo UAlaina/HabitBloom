@@ -56,6 +56,27 @@ class Task {
   }
 }
 
+
+class Report {
+  final int id;
+  final int score;
+  final int startDate;
+  final String interval;
+
+  const Report({required this.id, required this.score, required this.startDate, required this.interval});
+
+  Map<String, Object?> toMap() {
+    return {'id': id, 'score': score, 'startDate': startDate, 'interval': interval};
+  }
+
+  @override
+  String toString() {
+    return 'Task{id: $id, score: $score, startDate: $startDate, interval: $interval}';
+  }
+}
+
+
+
 // Static database map to store database instances
 class DbManager {
   static final Map<String, Database> _databases = {};
@@ -122,6 +143,15 @@ class DbHelper {
             title TEXT,
             completed INTEGER,
             FOREIGN KEY (habitId) REFERENCES habit(id) ON DELETE CASCADE
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE report(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            score INTEGER,
+            startDate TEXT,
+            interval TEXT
           )
         ''');
       },
@@ -276,6 +306,74 @@ class DbHelper {
       whereArgs: [id],
     );
   }
+
+
+
+
+
+  //========== REPORT ===============
+
+  // INSERT
+  Future<void> insertReport(Report report) async {
+    final db = await database;
+    await db.insert(
+      'report',
+      {
+        //room.toMap(), //is easy but maps everything including id, which wont AI
+        'score': report.score,
+        'startDate': report.startDate,
+        'interval': report.interval
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // LIST
+  Future<List<Report>> getReportsByInterval(String interval) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> query = await db.query(
+      'report',
+      where: 'interval = ?', // Use parameterized query to avoid SQL injection
+      whereArgs: [interval],
+    );
+
+    return query.map((map) => Report(
+      id: map['id'],
+      score: map['score'],
+      startDate: map['startDate'],
+      interval: map['interval'],
+    )).toList();
+  }
+
+  // UPDATE
+  Future<void> updateReport(Report report) async {
+    final db = await database;
+    await db.update(
+      'report',
+      report.toMap(),
+      where: 'id = ?',
+      whereArgs: [report.id],
+    );
+  }
+
+  // DELETE
+  Future<void> deleteReport(int id) async {
+    final db = await database;
+    await db.delete(
+      'report',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+
+
+
+
+
+
+
 
 
 

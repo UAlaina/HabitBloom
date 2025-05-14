@@ -6,6 +6,8 @@ import 'package:habittracker/notes/postit_page.dart';
 import 'package:habittracker/profile/profile_page.dart';
 import 'package:habittracker/settings/settings_page.dart';
 
+import 'time/date_check_service.dart';
+
 class HomeScreen extends StatefulWidget {
   final bool isDarkMode;
   final Function toggleDarkMode;
@@ -30,6 +32,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _updatePages();
+    // Initialize the date service
+    DateCheckService().initialize(interval: Duration(seconds: 5),);
+  }
+
+  @override
+  void dispose() {
+    // Clean up timer when app is closed
+    DateCheckService().dispose();
+    super.dispose();
   }
 
 
