@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _updatePages();
     // Initialize the date service
     //await DbService().ensureInitialized(userId);
-    DateCheckService().initialize(interval: Duration(seconds: 5),);
+    DateCheckService().initialize(interval: Duration(minutes: 30),);
   }
 
   @override
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_pageName),
-        backgroundColor: widget.isDarkMode ? Colors.grey[900] : Colors.pinkAccent,
+        backgroundColor: widget.isDarkMode ? Colors.grey[900] : Colors.teal,
       ),
       drawer: Drawer(
         child: Container(
@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               DrawerHeader(
                 decoration: BoxDecoration(
-                  color: widget.isDarkMode ? Colors.grey[900] : Colors.pinkAccent,
+                  color: widget.isDarkMode ? Colors.grey[900] : Colors.teal,
                 ),
                 child: Image.asset('assets/habit_tracker_icon.png'),
               ),

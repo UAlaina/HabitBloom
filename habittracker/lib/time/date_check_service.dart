@@ -25,7 +25,7 @@ class DateCheckService {
 
     _timer = Timer.periodic(interval, (_) {
       print('[!Service] Tick at ${DateTime.now()}');
-      //runDateCheck();
+      runDateCheck();
     });
   }
 

@@ -29,9 +29,9 @@ class _ListNotesPageState extends State<ListNotesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Notes List'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('Notes List'),
+      // ),
       body: _notes.isEmpty
           ? Center(child: Text('No notes available.'))
           : ListView.builder(

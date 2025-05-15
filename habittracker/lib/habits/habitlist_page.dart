@@ -98,9 +98,9 @@ class _HabitlistPageState extends State<HabitlistPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Habits'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('My Habits'),
+      // ),
       body: _habits == null || _habits!.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
