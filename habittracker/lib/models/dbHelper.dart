@@ -72,7 +72,7 @@ class Report {
 
   @override
   String toString() {
-    return 'Task{id: $id, score: $score, startTime: $startTime, interval: $interval}';
+    return 'Report{id: $id, score: $score, startTime: $startTime, interval: $interval}';
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:habittracker/notes/listNotesPage.dart';
 import 'package:habittracker/notes/postit_page.dart';
 import 'package:habittracker/profile/profile_page.dart';
 import 'package:habittracker/settings/settings_page.dart';
+import 'package:habittracker/reports/report_page.dart';
 
 import 'time/date_check_service.dart';
 import 'package:habittracker/models/db_service.dart';
@@ -50,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _pages = [
       const HabitlistPage(),
       HabitCalendarScreen(),
+      ReportPage(),
       const ListNotesPage(),
       PostItCanvasPage(),
       SettingsPage(
@@ -81,10 +83,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               _buildDrawerItem(Icons.home, 'Habits', 0),
               _buildDrawerItem(Icons.calendar_today, 'Calendar', 1),
-              _buildDrawerItem(Icons.note, 'Notes', 2),
-              _buildDrawerItem(Icons.sticky_note_2, 'Post-It', 3),
-              _buildDrawerItem(Icons.settings, 'Settings', 4),
-              _buildDrawerItem(Icons.person, 'Profile', 5),
+              _buildDrawerItem(Icons.note_alt, 'Progress', 2),
+              _buildDrawerItem(Icons.note, 'Notes', 3),
+              _buildDrawerItem(Icons.sticky_note_2, 'Post-It', 4),
+              _buildDrawerItem(Icons.settings, 'Settings', 5),
+              _buildDrawerItem(Icons.person, 'Profile', 6),
             ],
           ),
         ),

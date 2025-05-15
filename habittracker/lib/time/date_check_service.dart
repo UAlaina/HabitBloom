@@ -25,6 +25,7 @@ class DateCheckService {
 
     _timer = Timer.periodic(interval, (_) {
       print('[!Service] Tick at ${DateTime.now()}');
+      runDateCheck();
     });
   }
 
@@ -111,6 +112,7 @@ class DateCheckService {
     );
 
     try {
+      print('[!generated] report $report');
       await DbService().dbHelper.insertReport(report);
       print('[!report] ADDED success!!');
     } catch (e) {

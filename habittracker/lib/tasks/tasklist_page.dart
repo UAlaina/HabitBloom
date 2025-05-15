@@ -16,6 +16,8 @@ class _TaskListPageState extends State<TaskListPage> {
   final DbHelper dbHelper = DbService().dbHelper;
   List<Task>? _tasks = [];
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -28,12 +30,14 @@ class _TaskListPageState extends State<TaskListPage> {
       final loadedTasks = await DbService().dbHelper.getTasksById(widget.habitId);
       setState(() {
         _tasks = loadedTasks;
+        _isLoading = false;
       });
     } catch (e) {
       print('Error loading habits: $e');
     }
-    for (var habit in _tasks!) {
-      print('${habit.toString()}');
+    for (var task in _tasks!) {
+      print('[!task]found a task');
+      print('${task.toString()}');
     }
     print(_tasks);
     print('\n\n\n\n\n\n\n\n\n\nTEST\n\n\n\n\n\n');
@@ -92,6 +96,129 @@ class _TaskListPageState extends State<TaskListPage> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('HABITNAMEHERE'),
+      ),
+      body: Expanded(
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : _tasks == null || _tasks!.isEmpty
+            ? Center(
+          child: Column(
+            children: [
+              //CircularProgressIndicator(),
+              Text('No Task Yet'),
+            ],
+          ),
+        ) :
+        Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(12),
+                itemCount: _tasks!.length,
+                itemBuilder: (context, index) {
+                  final task = _tasks![index];
+                  return GestureDetector(
+                    onTap: () =>
+                    {
+                      //_navigateToTaskList(habit.id),
+                    },
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //CHECKBOX
+                              Checkbox(
+                                value: task.isCompleted,
+                                onChanged: (bool? value) async {
+                                  setState(() {
+                                    task.completed = value ?? false ? 1 : 0;
+                                  });
+                                  await _updateTaskStatus(task, task.completed);
+                                },
+                              ),
+                              //TEXT
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    task.title,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (task.completed != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Text(
+                                        'Completed: ${task.completed}',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              //DELETE BUTTON
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () async {
+                                  await _deleteTask(task.id);
+                                  setState(() {
+                                    _tasks!.removeAt(index);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+
+
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToAddTaskPage,
+        backgroundColor: Colors.grey[400],
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+
+
+
+
+/*
+Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('HABITNAMEHERE'),
@@ -190,4 +317,4 @@ class _TaskListPageState extends State<TaskListPage> {
       ),
     );
   }
-}
+ */
