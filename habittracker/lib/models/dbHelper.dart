@@ -431,6 +431,7 @@ class DbHelper {
   static Future<void> deleteDB(String userId) async {
     final dbPath = join(await getDatabasesPath(), 'habit_db_${userId}.db');
     await deleteDatabase(dbPath);
+    print('[!deleted] db');
   }
 
 

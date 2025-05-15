@@ -20,7 +20,6 @@ class DbService {
       _currentUserId = userId;
       //!EXP Delete DB
       //await DbHelper.deleteDB(userId);
-      //print('[!deleted] db');
       _dbHelper = DbHelper(userId: userId);
       print('DbService initialized with userId: $userId');
 
